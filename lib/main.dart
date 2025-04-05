@@ -19,12 +19,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue, // Основной цвет приложения
-          brightness: Brightness.light, // Светлая тема
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
         ),
-        useMaterial3: true, // Включаем Material 3
+        useMaterial3: true,
         inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder( // Стиль полей ввода
+          border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
           ),
         ),
