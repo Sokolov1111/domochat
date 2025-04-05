@@ -1,19 +1,16 @@
-import 'package:domochat/login_page.dart';
+import 'package:domochat/register_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<RegisterPage> createState() {
-    return _RegisterPageState();
-  }
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -39,10 +36,6 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 32,
               ),
-              _buildNameField(),
-              SizedBox(
-                height: 16,
-              ),
               _buildEmailField(),
               SizedBox(
                 height: 16,
@@ -51,11 +44,11 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 16,
               ),
-              _buildRegisterButton(),
+              _buildLoginButton(),
               SizedBox(
                 height: 24,
               ),
-              _buildLoginLink(),
+              _buildRegisterLink(),
             ],
           ),
         ),
@@ -66,34 +59,28 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        SizedBox(height: 20),
+        SizedBox(
+          height: 20,
+        ),
         AnimatedSwitcher(
-          duration: Duration(microseconds: 500),
+          duration: Duration(milliseconds: 1000),
           child: Image.asset(
             "images/logo.jpg",
             key: ValueKey('logo'),
             height: 120,
           ),
         ),
-        SizedBox(height: 16),
+        SizedBox(
+          height: 16,
+        ),
         Text(
-          'Заполните форму ниже, чтобы зарегистрироваться',
+          'Заполните форму ниже, чтобы войти',
           style: TextStyle(
             color: Colors.blueGrey[600],
             fontSize: 14,
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildNameField() {
-    return TextFormField(
-      controller: _nameController,
-      decoration: InputDecoration(
-          labelText: 'Имя', prefixIcon: Icon(Icons.person_outline)),
-      validator: (value) =>
-          value!.isEmpty ? 'Пожалуйста, введите ваше имя' : null,
     );
   }
 
@@ -136,35 +123,17 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildRegisterButton() {
-    return ElevatedButton(
-      onPressed: () {},
-      child: Text(
-        'Зарегистрироваться',
-        style: TextStyle(color: Colors.white),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue[800],
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  Widget _buildLoginLink() {
+  Widget _buildRegisterLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Уже есть аккаунт?'),
+        Text('Еще нет аккаунта?'),
         GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage()));
           },
           child: Text(
-            ' Войти',
+            ' Зарегистрироваться',
             style:
                 TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold),
           ),
@@ -173,9 +142,23 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildLoginButton() {
+    return ElevatedButton(
+        onPressed: () {},
+        child: Text(
+          'Войти',
+          style: TextStyle(color: Colors.white),
+        ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue[800],
+        padding: EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
