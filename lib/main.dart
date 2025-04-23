@@ -1,5 +1,6 @@
 
-import 'package:domochat/register_page.dart';
+import 'package:domochat/features/auth/presentation/pages/register_page.dart';
+import 'package:domochat/home_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const RegisterPage(),
+      home: const HomePage(),
     );
   }
 

@@ -1,4 +1,4 @@
-import 'package:domochat/login_page.dart';
+import 'package:domochat/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
