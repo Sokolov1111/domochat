@@ -13,10 +13,18 @@ class AuthRemoteDataSource {
       body: jsonEncode({'username': username, 'email': email, 'password': password}),
       headers: {'Content-Type': 'application/json'}
     );
-
+    print(response.statusCode);
     print(response.body);
+    if(response.statusCode == 201) {
+      final responseData = jsonDecode(response.body);
+      if (responseData['user'] != null) {
+        return UserModel.fromJson(responseData['user']);
+      }
+      return UserModel.fromJson(responseData);
+    } else {
+      throw Exception("Failed to register ${response.statusCode}");
+    }
 
-    return UserModel.fromJson(jsonDecode(response.body)['user']);
   }
 
   Future<UserModel> login({required String email, required String password}) async {
@@ -26,6 +34,7 @@ class AuthRemoteDataSource {
         headers: {'Content-Type': 'application/json'}
     );
 
+    print(response.body);
     return UserModel.fromJson(jsonDecode(response.body)['user']);
   }
 

@@ -1,6 +1,12 @@
+import 'package:domochat/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:domochat/features/auth/presentation/bloc/auth_event.dart';
 import 'package:domochat/features/auth/presentation/pages/register_page.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:domochat/features/auth/presentation/widgets/auth_input_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../bloc/auth_state.dart';
+import '../widgets/auth_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,11 +16,24 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _obscurePassword = true;
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _onLogin() {
+    BlocProvider.of<AuthBloc>(context).add(
+      LoginEvent(
+          email: _emailController.text,
+          password: _passwordController.text
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +47,6 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24),
         child: Form(
-          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -36,19 +54,38 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 32,
               ),
-              _buildEmailField(),
+              AuthInputField(hint: "Введите email", icon: Icons.email_outlined, controller: _emailController),
               SizedBox(
                 height: 16,
               ),
-              _buildPasswordField(),
+              AuthInputField(hint: "Введите пароль", icon: Icons.password_outlined, controller: _passwordController),
               SizedBox(
                 height: 16,
               ),
-              _buildLoginButton(),
+              BlocConsumer<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    if (state is AuthLoading) {
+                      return Center(child: CircularProgressIndicator(),);
+                    }
+                    return AuthButton(
+                        text: 'Войти',
+                        onPressed: _onLogin
+                    );
+                  },
+                  listener: (context, state) {
+                    if (state is AuthSuccess) {
+                      Navigator.pushNamedAndRemoveUntil(context, '/homePage', (route) => false);
+                    } else if (state is AuthFailure) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(state.error))
+                      );
+                    }
+                  }
+              ),
               SizedBox(
                 height: 24,
               ),
-              _buildRegisterLink(),
+              _buildLoginLink(),
             ],
           ),
         ),
@@ -59,22 +96,18 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        SizedBox(
-          height: 20,
-        ),
+        SizedBox(height: 20),
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 1000),
+          duration: Duration(microseconds: 500),
           child: Image.asset(
             "images/logo.jpg",
             key: ValueKey('logo'),
             height: 120,
           ),
         ),
-        SizedBox(
-          height: 16,
-        ),
+        SizedBox(height: 16),
         Text(
-          'Заполните форму ниже, чтобы войти',
+          'Заполните форму ниже, чтобы зарегистрироваться',
           style: TextStyle(
             color: Colors.blueGrey[600],
             fontSize: 14,
@@ -84,83 +117,26 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildEmailField() {
-    return TextFormField(
-      controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        prefixIcon: Icon(Icons.email_outlined),
-      ),
-      validator: (value) {
-        if (value!.isEmpty) return 'Пожалуйста, введите email';
-        //if (!RegExp())
-        return null;
-      },
-    );
-  }
 
-  Widget _buildPasswordField() {
-    return TextFormField(
-      controller: _passwordController,
-      obscureText: _obscurePassword,
-      decoration: InputDecoration(
-        labelText: 'Пароль',
-        prefixIcon: Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon:
-              Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
-          onPressed: () => setState(() {
-            _obscurePassword = !_obscurePassword;
-          }),
-        ),
-      ),
-      validator: (value) {
-        if (value!.isEmpty) return "Пожалуйста, введите пароль!";
-        //if (value.length < 2) return "Пожалуйста, введите пароль!";
-        return null;
-      },
-    );
-  }
-
-  Widget _buildRegisterLink() {
+  Widget _buildLoginLink() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Еще нет аккаунта?'),
+        Text('Уже есть аккаунт?'),
         GestureDetector(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RegisterPage()),
+            );
           },
           child: Text(
-            ' Зарегистрироваться',
+            ' Войти',
             style:
-                TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold),
+            TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold),
           ),
         ),
       ],
     );
-  }
-
-  Widget _buildLoginButton() {
-    return ElevatedButton(
-        onPressed: () {},
-        child: Text(
-          'Войти',
-          style: TextStyle(color: Colors.white),
-        ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue[800],
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }
