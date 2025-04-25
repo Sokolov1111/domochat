@@ -1,8 +1,11 @@
 import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:domochat/features/auth/presentation/pages/profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -11,6 +14,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final String _selectedCommunity = "My house";
+  final _storage = FlutterSecureStorage();
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,21 +78,31 @@ class _HomePageState extends State<HomePage> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(
-              accountName: const Text("Sokolov Ivan"), 
-              accountEmail: const Text("st. Dachnaya 8,"),
-              currentAccountPicture: const CircleAvatar(
-                backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s"),
+          FutureBuilder<String?>(
+            future: _storage.read(key: "userName"),
+            builder: (context, snapshot) {
+              return UserAccountsDrawerHeader(
+                accountName: Text(snapshot.data ?? "Гость"),
+                accountEmail: const Text("st. Dachnaya 8,"),
+                currentAccountPicture: const CircleAvatar(
+                  backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s"),
 
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade800,
-              ),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade800,
+                ),
+              );
+            }
           ),
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('Profile'),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              );
+            },
           ),
           const Divider(),
           const Padding(

@@ -14,3 +14,9 @@ class LoginEvent extends AuthEvent {
 
   LoginEvent({required this.email, required this.password});
 }
+
+class UpdateUsernameEvent extends AuthEvent {
+  final String newUsername;
+
+  UpdateUsernameEvent({required this.newUsername});
+}

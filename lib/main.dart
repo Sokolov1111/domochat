@@ -3,8 +3,10 @@ import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.
 import 'package:domochat/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:domochat/features/auth/domain/usecases/login_use_case.dart';
 import 'package:domochat/features/auth/domain/usecases/register_use_case.dart';
+import 'package:domochat/features/auth/domain/usecases/update_username_use_case.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:domochat/features/auth/presentation/pages/login_page.dart';
+import 'package:domochat/features/auth/presentation/pages/profile_page.dart';
 import 'package:domochat/features/auth/presentation/pages/register_page.dart';
 import 'package:domochat/home_page.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,8 @@ class MyApp extends StatelessWidget {
           BlocProvider(
               create: (_) => AuthBloc(
                   registerUseCase: RegisterUseCase(repository: authRepositoryImpl),
-                  loginUseCase: LoginUseCase(repository: authRepositoryImpl)
+                  loginUseCase: LoginUseCase(repository: authRepositoryImpl),
+                  updateUsernameUseCase: UpdateUsernameUseCase(repository: authRepositoryImpl)
               )
           ),
         ],
@@ -52,6 +55,7 @@ class MyApp extends StatelessWidget {
             '/login': (_) => LoginPage(),
             '/register': (_) => RegisterPage(),
             '/homePage' : (_) => HomePage(),
+            '/profilePage': (_) => ProfilePage(),
           },
         ),
     );
