@@ -2,10 +2,13 @@
 import 'dart:convert';
 
 import 'package:domochat/features/auth/data/models/user_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteDataSource {
   final String baseUrl = 'http://10.0.2.2:6000/auth';
+  final String baseUrl1 = 'http://10.0.2.2:6000';
+  final _storage = FlutterSecureStorage();
 
   Future<UserModel> register({required String username, required String email, required String password}) async {
     final response = await http.post(
@@ -34,6 +37,20 @@ class AuthRemoteDataSource {
         headers: {'Content-Type': 'application/json'}
     );
 
+    print(response.body);
+    return UserModel.fromJson(jsonDecode(response.body)['user']);
+  }
+
+  Future<UserModel> updateUsername({required String username}) async {
+    String token = await _storage.read(key: 'token') ?? '';
+    final response = await http.put(
+      Uri.parse("$baseUrl1/profile"),
+      body: jsonEncode({'newUsername': username}),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      }
+    );
     print(response.body);
     return UserModel.fromJson(jsonDecode(response.body)['user']);
   }
