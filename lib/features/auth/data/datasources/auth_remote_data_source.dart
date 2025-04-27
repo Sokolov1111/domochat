@@ -6,8 +6,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteDataSource {
-  final String baseUrl = 'http://10.0.2.2:6000/auth';
-  final String baseUrl1 = 'http://10.0.2.2:6000';
+  final String baseUrl = 'http://10.0.2.2:6001/auth';
+  final String baseUrl1 = 'http://10.0.2.2:6001';
   final _storage = FlutterSecureStorage();
 
   Future<UserModel> register({required String username, required String email, required String password}) async {

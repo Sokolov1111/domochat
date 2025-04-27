@@ -6,6 +6,9 @@ import 'package:domochat/features/auth/domain/entities/user_entity.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_event.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_state.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +25,12 @@ class _ProfilePageState extends State<ProfilePage> {
   final String avatarUrl = "";
 
   @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<CommunityListBloc>(context).add(FetchCommunities());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -33,8 +42,39 @@ class _ProfilePageState extends State<ProfilePage> {
           )
         ],
       ),
-      body: BlocBuilder<AuthBloc, AuthState> (
+      body: BlocConsumer<AuthBloc, AuthState> (
+        listener: (context, state) {
+          if (state is AuthFailure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("error")),
+            );
+          }
+          if (state is AuthSuccess && state.message.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+          if (state is AuthLoading) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("load")),
+            );
+          }
+          if (state is AuthInitial) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("init")),
+            );
+          }
+          if (state is UsernameUpdatedState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("nameUpdate")),
+            );
+          }
+        },
+
         builder: (context, state) {
+          if (state is AuthLoading) {
+            return Center(child: CircularProgressIndicator(),);
+          }
           if (state is AuthSuccess) {
             return SingleChildScrollView(
               padding: EdgeInsets.all(16),
@@ -42,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   _buildAvatarSection(context, state.user),
                   SizedBox(height: 24,),
-                  _buildProfileCard(context, state.user),
+                  _buildProfileCard(state.user),
                   SizedBox(height: 24,),
                   _buildStateSection(),
                   SizedBox(height: 24,),
@@ -51,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             );
           }
-          return Center(child: CircularProgressIndicator(),);
+          return Center(child: Text('Ошибка загрузки'),);
         },
       ),
     );
@@ -96,7 +136,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileCard(BuildContext context, UserModel user) {
+  Widget _buildProfileCard(UserModel user) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -106,24 +146,10 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            BlocConsumer<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthSuccess) {
-                    return _buildEditableField(
-                      title: 'Имя',
-                      value: state.user.username,
-                      onEdit: () => _editUsernameField(context, state.user)
-                    );
-                  }
-                  return CircularProgressIndicator();
-                },
-                listener: (context, state) {
-                  if (state is UsernameUpdatedState) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Имя успешно изменено!')),
-                    );
-                  }
-                }
+            _buildEditableField(
+                title: 'Имя',
+                value: user.username,
+                onEdit: () => _editUsernameField(context, user) // context берется из build метода
             ),
             Divider(),
             _buildEditableField(
@@ -133,14 +159,15 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Divider(),
             _buildInfoField(
-              title: 'Дата регистрации',
-              value: '11 12 2002'
+                title: 'Дата регистрации',
+                value: '11 12 2002'
             ),
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildEditableField({
     required String title,
@@ -177,13 +204,22 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       child: Padding(
         padding: EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildStatItem('2', 'Комьюнити'),
-            _buildStatItem('0', 'Объявлений'),
-            _buildStatItem('27', 'Личных чатов'),
-          ],
+        child: BlocBuilder<CommunityListBloc, CommunityListState>(
+          builder: (context, state) {
+            if (state is CommunityListLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is CommunityListLoaded) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem(state.communityList.length.toString(), 'Комьюнити'),
+                  _buildStatItem('0', 'Объявлений'),
+                  _buildStatItem('27', 'Личных чатов'),
+                ],
+              );
+            }
+            return Text("err");
+          }
         ),
       ),
     );
@@ -266,9 +302,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             TextButton(
                 onPressed: () {
-                  if (controller.text.isNotEmpty) {
+                  if (controller.text.trim().isNotEmpty) {
                     BlocProvider.of<AuthBloc>(context).add(
-                      UpdateUsernameEvent(newUsername: controller.text)
+                      UpdateUsernameEvent(newUsername: controller.text.trim())
                     );
                     Navigator.pop(ctx);
                   }

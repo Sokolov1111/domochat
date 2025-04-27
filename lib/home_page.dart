@@ -1,6 +1,10 @@
 import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:domochat/features/auth/presentation/pages/profile_page.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +20,11 @@ class _HomePageState extends State<HomePage> {
   final String _selectedCommunity = "My house";
   final _storage = FlutterSecureStorage();
 
+  @override
+  void initState() {
+   super.initState();
+   BlocProvider.of<CommunityListBloc>(context).add(FetchCommunities());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +53,9 @@ class _HomePageState extends State<HomePage> {
               icon: Icons.group_add,
               title: 'Create a community',
               color: Colors.blue,
-              onTap: () => _createCommunity(),
+              onTap: () => {
+               Navigator.pushNamedAndRemoveUntil(context, '/createCommunityPage', (route) => false)
+              },
             ),
             const SizedBox(height: 16,),
             _buildActionCard(
@@ -112,26 +123,37 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
           ),
-          ExpansionTile(
-              leading: const Icon(Icons.apartment),
-              title: const Text('House №8'),
-              children: [
-                _buildCommunityItem('Общий чат', Icons.chat),
-                _buildCommunityItem('Важное', Icons.announcement),
-                _buildCommunityItem('Доска объявлений', Icons.list_alt),
-                _buildCommunityItem('Совместные поездки', Icons.directions_car),
-              ],
-          ),
-          ExpansionTile(
-            leading: const Icon(Icons.apartment),
-            title: const Text('House №9'),
-            children: [
-              _buildCommunityItem('Общий чат', Icons.chat),
-              _buildCommunityItem('Важное', Icons.announcement),
-              _buildCommunityItem('Доска объявлений', Icons.list_alt),
-              _buildCommunityItem('Совместные поездки', Icons.directions_car),
-            ],
-          ),
+          BlocBuilder<CommunityListBloc, CommunityListState>(
+            builder: (context, state) {
+              if (state is CommunityListLoading) {
+                return Center(child: CircularProgressIndicator());
+              } else if (state is CommunityListLoaded) {
+                if (state.communityList.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text("Нет созданных сообществ"),
+                  );
+                }
+                return Column(
+                    children: state.communityList.map((community) =>
+                        ExpansionTile(
+                          leading: const Icon(Icons.apartment),
+                          title: Text("${community.adressStreet}, ${community.adressHouse}"),
+                          children: [
+                            _buildCommunityItem('Общий чат', Icons.chat),
+                            _buildCommunityItem('Важное', Icons.announcement),
+                            _buildCommunityItem('Доска объявлений', Icons.list_alt),
+                            _buildCommunityItem('Совместные поездки', Icons.directions_car),
+                          ],
+                        )
+                    ).toList(),
+                );
+              } else if (state is CommunityListError) {
+                return Text(state.message);
+              }
+              return const SizedBox.shrink();
+            }
+          )
         ],
       ),
     );
