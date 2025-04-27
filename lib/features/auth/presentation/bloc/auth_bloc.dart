@@ -47,10 +47,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onUpdateUsername(UpdateUsernameEvent event, Emitter<AuthState> emit) async {
     try {
-      final updatedUser = await updateUsernameUseCase(event.newUsername);
-      emit(UsernameUpdatedState(user: updatedUser as UserModel));
-      emit(AuthSuccess(message: "Ok", user: updatedUser));
+      emit(AuthLoading());
+      final updatedUser = await updateUsernameUseCase(event.newUsername) as UserModel;
+      await _storage.write(key: 'userName', value: updatedUser.username);
+      emit(AuthSuccess(message: "Имя обновлено", user: updatedUser));
     } catch (e) {
+      if(state is AuthSuccess) {
+        emit(state);
+      }
       emit(AuthFailure(error: 'Failed to update username'));
     }
   }
