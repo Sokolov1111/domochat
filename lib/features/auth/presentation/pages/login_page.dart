@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 32,
               ),
-              AuthInputField(hint: "Введите email", icon: Icons.email_outlined, controller: _emailController),
+              AuthInputField(hint: "Введите логин", icon: Icons.email_outlined, controller: _emailController),
               SizedBox(
                 height: 16,
               ),
@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         SizedBox(height: 16),
         Text(
-          'Заполните форму ниже, чтобы зарегистрироваться',
+          'Заполните форму ниже, чтобы войти',
           style: TextStyle(
             color: Colors.blueGrey[600],
             fontSize: 14,
@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Уже есть аккаунт?'),
+        Text('Еще нет аккаунта?'),
         GestureDetector(
           onTap: () {
             Navigator.push(
@@ -131,9 +131,9 @@ class _LoginPageState extends State<LoginPage> {
             );
           },
           child: Text(
-            ' Войти',
+            ' Зарегистрироваться',
             style:
-            TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold),
+            TextStyle(color: Colors.blue[800], fontWeight: FontWeight.bold,),
           ),
         ),
       ],

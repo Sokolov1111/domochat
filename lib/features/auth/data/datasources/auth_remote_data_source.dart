@@ -6,8 +6,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteDataSource {
-  final String baseUrl = 'http://10.0.2.2:6001/auth';
-  final String baseUrl1 = 'http://10.0.2.2:6001';
+  final String baseUrl = 'http://10.0.2.2:6102/auth';
+  final String baseUrl1 = 'http://10.0.2.2:6102';
   final _storage = FlutterSecureStorage();
 
   Future<UserModel> register({required String username, required String email, required String password}) async {
@@ -51,7 +51,7 @@ class AuthRemoteDataSource {
         'Authorization': 'Bearer $token',
       }
     );
-    print(response.body);
+    print(jsonDecode(response.body)['user']);
     return UserModel.fromJson(jsonDecode(response.body)['user']);
   }
 

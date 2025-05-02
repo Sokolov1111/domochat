@@ -65,11 +65,11 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 16,
               ),
-              AuthInputField(hint: "Введите email", icon: Icons.email_outlined, controller: _emailController),
+              AuthInputField(hint: "Введите логин", icon: Icons.email_outlined, controller: _emailController),
               SizedBox(
                 height: 16,
               ),
-              AuthInputField(hint: "Введите пароль", icon: Icons.password_outlined, controller: _passwordController),
+              AuthInputField(hint: "Введите пароль", icon: Icons.password_outlined, controller: _passwordController, isPassword: true,),
               SizedBox(
                 height: 16,
               ),

@@ -22,7 +22,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String avatarUrl = "";
+  final String avatarUrl = "images/icon_logo_1.png";
 
   @override
   void initState() {
@@ -105,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(avatarUrl),
+              backgroundImage: AssetImage(avatarUrl),
             ),
             Container(
               decoration: BoxDecoration(
@@ -153,14 +153,14 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             Divider(),
             _buildEditableField(
-              title: 'Email',
+              title: 'Логин',
               value: user.email,
               onEdit: () => {},
             ),
             Divider(),
             _buildInfoField(
                 title: 'Дата регистрации',
-                value: '11 12 2002'
+                value: '20 04 2025'
             ),
           ],
         ),
@@ -214,7 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   _buildStatItem(state.communityList.length.toString(), 'Комьюнити'),
                   _buildStatItem('0', 'Объявлений'),
-                  _buildStatItem('27', 'Личных чатов'),
+                  _buildStatItem('0', 'Личных чатов'),
                 ],
               );
             }

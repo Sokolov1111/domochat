@@ -15,7 +15,7 @@ class UserModel extends UserEntity {
         id: json['id'],
         username: json['username'],
         email: json['email'],
-        password: json['password'],
+        password: json['password'] ?? '',
         token: json.containsKey('token') ? json['token']?.toString() : null,
     );
   }
