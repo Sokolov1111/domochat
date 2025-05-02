@@ -1,5 +1,9 @@
 import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:domochat/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:domochat/features/auth/presentation/bloc/auth_state.dart';
 import 'package:domochat/features/auth/presentation/pages/profile_page.dart';
+import 'package:domochat/features/chat/presentation/pages/chat_page.dart';
+import 'package:domochat/features/community/data/models/community_model.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
@@ -35,7 +39,7 @@ class _HomePageState extends State<HomePage> {
           icon: const Icon(Icons.menu),
           onPressed: () => _globalKey.currentState?.openDrawer(),
         ),
-        title: Text(_selectedCommunity),
+        title: Text("Welcome"),
         actions: [
           IconButton(
               onPressed: () {},
@@ -51,7 +55,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildActionCard(
               icon: Icons.group_add,
-              title: 'Create a community',
+              title: 'Создать сообщество',
               color: Colors.blue,
               onTap: () => {
                Navigator.pushNamedAndRemoveUntil(context, '/createCommunityPage', (route) => false)
@@ -60,7 +64,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 16,),
             _buildActionCard(
               icon: Icons.login,
-              title: 'Join to community',
+              title: 'Присоединиться к сообществу',
               color: Colors.blue,
               onTap: () => _joinCommunity(),
             ),
@@ -89,20 +93,29 @@ class _HomePageState extends State<HomePage> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          FutureBuilder<String?>(
-            future: _storage.read(key: "userName"),
-            builder: (context, snapshot) {
-              return UserAccountsDrawerHeader(
-                accountName: Text(snapshot.data ?? "Гость"),
-                accountEmail: const Text("st. Dachnaya 8,"),
-                currentAccountPicture: const CircleAvatar(
-                  backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s"),
-
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade800,
-                ),
-              );
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              if (state is AuthFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("error")),
+                );
+              }
+              if (state is AuthLoading) {
+                return Center(child: CircularProgressIndicator(),);
+              }
+              if (state is AuthSuccess) {
+                return UserAccountsDrawerHeader(
+                  accountName: Text(state.user.username),
+                  accountEmail: Text(state.user.email),
+                  currentAccountPicture: const CircleAvatar(
+                      backgroundImage: AssetImage("images/icon_logo_1.png")
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade800,
+                  ),
+                );
+              }
+              return Center(child: Text('Ошибка загрузки'),);
             }
           ),
           ListTile(
@@ -140,10 +153,18 @@ class _HomePageState extends State<HomePage> {
                           leading: const Icon(Icons.apartment),
                           title: Text("${community.adressStreet}, ${community.adressHouse}"),
                           children: [
-                            _buildCommunityItem('Общий чат', Icons.chat),
-                            _buildCommunityItem('Важное', Icons.announcement),
-                            _buildCommunityItem('Доска объявлений', Icons.list_alt),
-                            _buildCommunityItem('Совместные поездки', Icons.directions_car),
+                            _buildCommunityItem(
+                                'Общий чат',
+                                Icons.chat,
+                                () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                    ChatPage(community: community as CommunityModel, conversationId: community.conversationsId[0])
+                                  ));
+                                },
+                            ),
+                            _buildCommunityItem('Важное', Icons.announcement, (){}),
+                            _buildCommunityItem('Доска объявлений', Icons.list_alt, (){}),
+                            _buildCommunityItem('Совместные поездки', Icons.directions_car, (){}),
                           ],
                         )
                     ).toList(),
@@ -159,12 +180,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCommunityItem(String title, IconData icon) {
+  Widget _buildCommunityItem(String title, IconData icon, void Function()? _onTap) {
     return ListTile(
       dense: true,
       leading: Icon(icon, size: 20,),
       title: Text(title),
-      onTap: () {},
+      onTap: _onTap,
     );
   }
 
@@ -208,7 +229,7 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: const CircleAvatar(
-          backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJxo2NFiYcR35GzCk5T3nxA7rGlSsXvIfJwg&s"),
+          backgroundImage: AssetImage("images/icon_logo_2.png"),
         ),
         title: const Text("Продам стол"),
         subtitle: const Text("В отличном состоянии,торг"),

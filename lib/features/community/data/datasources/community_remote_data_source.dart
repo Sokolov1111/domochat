@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:domochat/features/community/data/models/community_model.dart';
 
 class CommunityRemoteDataSource {
-  final String baseUrl = 'http://10.0.2.2:6001';
+  final String baseUrl = 'http://10.0.2.2:6102';
   final _storage = FlutterSecureStorage();
 
   Future<CommunityModel> createCommunity ({
@@ -33,11 +33,11 @@ class CommunityRemoteDataSource {
         'Authorization': 'Bearer $token',
       }
     );
-    print(jsonDecode(response.body)['community']);
+    print(jsonDecode(response.body));
     if(response.statusCode == 201) {
       final responseData = jsonDecode(response.body);
       if (responseData['community'] != null) {
-        return CommunityModel.fromJson(responseData['community']);
+        return CommunityModel.fromJson(responseData);
       }
       return CommunityModel.fromJson(responseData);
     } else {
@@ -55,6 +55,7 @@ class CommunityRemoteDataSource {
     );
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
+      print(response.body);
       return data.map((json) => CommunityModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch community');

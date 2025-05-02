@@ -1,5 +1,6 @@
 import 'package:domochat/features/community/data/models/community_model.dart';
 
+abstract class CommunityState {}
 abstract class CreateCommunityState {}
 
 class CreateCommunityInitial extends CreateCommunityState {}
@@ -17,3 +18,10 @@ class CreateCommunityFailure extends CreateCommunityState {
 }
 
 class CreateCommunityLoading extends CreateCommunityState {}
+
+class JoinCommunityLoading extends CommunityState {}
+class JoinCommunitySuccess extends CommunityState {}
+class JoinCommunityFailure extends CommunityState {
+  final String error;
+  JoinCommunityFailure({required this.error});
+}

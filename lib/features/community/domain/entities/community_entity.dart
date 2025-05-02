@@ -4,6 +4,7 @@ class CommunityEntity {
   final String adressStreet;
   final String adressHouse;
   final String creatorId;
+  final List<String> conversationsId;
 
   CommunityEntity ({
       required this.id,
@@ -11,5 +12,6 @@ class CommunityEntity {
       required this.adressStreet,
       required this.adressHouse,
       required this.creatorId,
+      required this.conversationsId,
   });
 }
