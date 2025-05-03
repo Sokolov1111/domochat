@@ -61,7 +61,7 @@ class _AnnouncementsListPageState extends State<AnnouncementsListPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => CreateAnnouncementPage()),
+          MaterialPageRoute(builder: (context) => CreateAnnouncementPage(communityId: widget.communityId,)),
         ),
         backgroundColor: Colors.blue[800],
         child: Icon(
@@ -118,7 +118,7 @@ class _AnnouncementsListPageState extends State<AnnouncementsListPage> {
                             BorderRadius.vertical(top: Radius.circular(6)),
                         child: announcement.imageUrls.isNotEmpty
                           ? Image.network(
-                            announcement.imageUrls.first ,
+                            announcement.imageUrls[0],
                             width: double.infinity,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
