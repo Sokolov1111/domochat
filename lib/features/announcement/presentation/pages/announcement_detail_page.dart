@@ -28,7 +28,7 @@ class _AnnouncementDetailPageState extends State<AnnouncementDetailPage> {
                 height: 300,
                 child: PageView.builder(
                   itemCount: widget.announcement.imageUrls.length,
-                  itemBuilder: (context, index) => Image.asset(
+                  itemBuilder: (context, index) => Image.network(
                     widget.announcement.imageUrls[index],
                     fit: BoxFit.cover,
                   ),

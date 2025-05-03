@@ -11,6 +11,4 @@ class CreateCommunitySubmitted extends CreateCommunityEvent {
   final String residentStatus;
 
   CreateCommunitySubmitted({required this.city, required this.street, required this.house, required this.creatorId, required this.fullName,  required this.apartment, required this.residentStatus});
-
-
 }
