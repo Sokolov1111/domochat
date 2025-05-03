@@ -1,3 +1,4 @@
+import 'package:domochat/features/announcement/presentation/pages/announcements_list_page.dart';
 import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:domochat/features/auth/presentation/bloc/auth_state.dart';
@@ -163,7 +164,11 @@ class _HomePageState extends State<HomePage> {
                                 },
                             ),
                             _buildCommunityItem('Важное', Icons.announcement, (){}),
-                            _buildCommunityItem('Доска объявлений', Icons.list_alt, (){}),
+                            _buildCommunityItem('Доска объявлений', Icons.list_alt, (){
+                              Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                  AnnouncementsListPage(communityId: community.id,)
+                              ));
+                            }),
                             _buildCommunityItem('Совместные поездки', Icons.directions_car, (){}),
                           ],
                         )

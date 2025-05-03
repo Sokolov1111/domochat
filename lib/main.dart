@@ -1,4 +1,9 @@
 
+import 'package:domochat/features/announcement/data/datasources/announcement_remote_datasource.dart';
+import 'package:domochat/features/announcement/data/repositories/announcement_repository_impl.dart';
+import 'package:domochat/features/announcement/domain/usecases/fetch_announcements_use_case.dart';
+import 'package:domochat/features/announcement/presentation/bloc/announcement_bloc.dart';
+import 'package:domochat/features/announcement/presentation/pages/announcements_list_page.dart';
 import 'package:domochat/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:domochat/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:domochat/features/auth/domain/usecases/login_use_case.dart';
@@ -27,10 +32,12 @@ void main() {
   final authRepository = AuthRepositoryImpl(authRemoteDataSource: AuthRemoteDataSource());
   final communityRepository = CommunityRepositoryImpl(communityRemoteDataSource: CommunityRemoteDataSource());
   final messageRepository = MessageRepositoryImpl(remoteDataSource: MessageRemoteDataSource());
+  final announcementRepository = AnnouncementRepositoryImpl(announcementRemoteDataSource: AnnouncementRemoteDatasource());
   runApp(MyApp(
     authRepositoryImpl: authRepository,
     communityRepositoryImpl: communityRepository,
     messageRepositoryImpl: messageRepository,
+    announcementRepositoryImpl: announcementRepository,
   ));
 }
 
@@ -38,8 +45,15 @@ class MyApp extends StatelessWidget {
   final AuthRepositoryImpl authRepositoryImpl;
   final CommunityRepositoryImpl communityRepositoryImpl;
   final MessageRepositoryImpl messageRepositoryImpl;
+  final AnnouncementRepositoryImpl announcementRepositoryImpl;
 
-  const MyApp({super.key, required this.authRepositoryImpl, required this.communityRepositoryImpl, required this.messageRepositoryImpl});
+  const MyApp({
+    super.key,
+    required this.authRepositoryImpl,
+    required this.communityRepositoryImpl,
+    required this.messageRepositoryImpl,
+    required this.announcementRepositoryImpl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +78,9 @@ class MyApp extends StatelessWidget {
           BlocProvider(
               create: (_) => ChatBloc(fetchMessagesUseCase: FetchMessagesUseCase(messageRepository: messageRepositoryImpl))
           ),
+          BlocProvider(
+            create: (_) => AnnouncementBloc(fetchAnnouncementsUseCase: FetchAnnouncementsUseCase(announcementRepositoryImpl)),
+          )
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
