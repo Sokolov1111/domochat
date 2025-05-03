@@ -1,13 +1,14 @@
 
 import 'dart:convert';
 
+import 'package:domochat/core/constants.dart';
 import 'package:domochat/features/chat/data/models/message_model.dart';
 import 'package:domochat/features/chat/domain/entities/message_entity.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class MessageRemoteDataSource {
-  final String baseUrl = 'http://10.0.2.2:6102';
+  final String baseUrl = ConstantsLinks.baseUrl;
   final _storage = FlutterSecureStorage();
 
   Future<List<MessageEntity>> fetchMessages(String conversationId) async {
