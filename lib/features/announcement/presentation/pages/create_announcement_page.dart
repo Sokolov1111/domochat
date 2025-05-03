@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:domochat/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,6 +20,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final _storage = FlutterSecureStorage();
+  final String baseUrl = ConstantsLinks.baseUrl;
   List<XFile> _selectedImages = [];
 
   Future<void> _pickImages() async {
@@ -39,7 +41,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   Future<void> _submitForm() async {
     String token = await _storage.read(key: 'token') ?? '';
     if (_formKey.currentState!.validate()) {
-      final uri = Uri.parse('http://10.0.2.2:6102/announcements/create');
+      final uri = Uri.parse('$baseUrl/announcements/create');
       final request = http.MultipartRequest('POST', uri);
 
       request.fields['title'] = _titleController.text;
