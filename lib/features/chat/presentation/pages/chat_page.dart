@@ -23,6 +23,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final _storage = FlutterSecureStorage();
+  final ScrollController _scrollController = ScrollController();
   String userId = '';
 
   @override
@@ -30,6 +31,9 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     BlocProvider.of<ChatBloc>(context).add(LoadMessageEvent(widget.conversationId));
     fetchUserId();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
   }
 
   fetchUserId() async {
@@ -51,8 +55,21 @@ class _ChatPageState extends State<ChatPage> {
       BlocProvider.of<ChatBloc>(context).add(
         SendMessageEvent(widget.conversationId, content),
       );
+      WidgetsBinding.instance.addPostFrameCallback((_){
+        _scrollToBottom();
+      });
     }
     _messageController.clear();
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -76,13 +93,14 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: [
           Expanded(
-              child: BlocBuilder<ChatBloc, ChatState> (
+              child: BlocConsumer<ChatBloc, ChatState> (
                 builder: (context, state) {
                   if (state is ChatLoadingState) {
                     return Center(child: CircularProgressIndicator(),);
                   } else if(state is ChatLoadedState) {
                     return
                         ListView.builder(
+                          controller: _scrollController,
                           padding: EdgeInsets.all(20),
                           itemCount: state.messages.length,
                           itemBuilder: (context, index) {
@@ -99,7 +117,13 @@ class _ChatPageState extends State<ChatPage> {
                     return Center(child: Text(state.message),);
                   }
                   return Center(child: Text("No messages found"),);
-                },
+                }, listener: (context, state) {
+                  if (state is ChatLoadedState) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _scrollToBottom();
+                    });
+                  }
+              },
               )
           ),
           _buildMessageInput(),
@@ -158,8 +182,6 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildSentMessage(BuildContext context, String message, String createdAt) {
-    // DateTime dateTime = DateTime.parse(createdAt.replaceAll('', 'T'));
-    // String time = "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
     return Align(
       alignment: Alignment.centerRight,
       child: ConstrainedBox(

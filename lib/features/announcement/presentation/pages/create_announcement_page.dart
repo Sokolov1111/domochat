@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:domochat/core/constants.dart';
+import 'package:domochat/features/announcement/presentation/pages/announcements_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,6 +63,10 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
       final response = await request.send();
       if (response.statusCode == 201) {
         print("Объявление добавилось");
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AnnouncementsListPage(communityId: widget.communityId,)),
+        );
       } else {
         print("Ошибка");
       }
