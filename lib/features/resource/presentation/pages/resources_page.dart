@@ -2,6 +2,7 @@ import 'package:domochat/features/resource/data/models/resource_model.dart';
 import 'package:domochat/features/resource/presentation/bloc/resource_bloc.dart';
 import 'package:domochat/features/resource/presentation/bloc/resource_event.dart';
 import 'package:domochat/features/resource/presentation/bloc/resource_state.dart';
+import 'package:domochat/features/resource/presentation/pages/create_resource_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -53,6 +54,17 @@ class _ResourcesPageState extends State<ResourcesPage> {
           }
           return const SizedBox.shrink();
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CreateResourcePage(communityId: widget.communityId))
+        ),
+        backgroundColor: Colors.blue[800],
+        child: Icon(
+          Icons.add_outlined,
+          color: Colors.white,
+        ),
       ),
     );
   }
