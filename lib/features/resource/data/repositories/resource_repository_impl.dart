@@ -13,4 +13,15 @@ class ResourceRepositoryImpl implements ResourceRepository {
     return await resourceRemoteDataSource.fetchResources(communityId);
   }
 
+  @override
+  Future<ResourceEntity> createResource(String communityId, String title, String description, String contactInfo, String category) async {
+    return await resourceRemoteDataSource.createResource(
+      communityId: communityId,
+      title: title,
+      description: description,
+      contactInfo: contactInfo,
+      category: category,
+    );
+  }
+
 }

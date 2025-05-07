@@ -11,7 +11,7 @@ class ResourceModel extends ResourceEntity {
         description: json['description'],
         contactInfo: json['contact_info'],
         category: json['category'],
-        author: json['author_name'],
+        author: json['author_name'] ?? '',
         date: json['created_at']
     );
   }

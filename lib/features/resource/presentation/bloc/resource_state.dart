@@ -15,3 +15,12 @@ class ResourceErrorState extends ResourceState {
   final String message;
   ResourceErrorState(this.message);
 }
+
+class CreateResourceSuccess extends ResourceState {
+  final String message;
+  final ResourceEntity resourceEntity;
+
+  CreateResourceSuccess({required this.message, required this.resourceEntity});
+
+
+}

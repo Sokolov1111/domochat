@@ -26,6 +26,7 @@ import 'package:domochat/features/community/presentation/bloc/community_bloc.dar
 import 'package:domochat/features/community/presentation/pages/create_community_page.dart';
 import 'package:domochat/features/resource/data/datasources/resource_remote_data_source.dart';
 import 'package:domochat/features/resource/data/repositories/resource_repository_impl.dart';
+import 'package:domochat/features/resource/domain/usecases/create_resource_use_case.dart';
 import 'package:domochat/features/resource/domain/usecases/fetch_resources_use_case.dart';
 import 'package:domochat/features/resource/presentation/bloc/resource_bloc.dart';
 import 'package:domochat/home_page.dart';
@@ -91,7 +92,10 @@ class MyApp extends StatelessWidget {
             create: (_) => AnnouncementBloc(fetchAnnouncementsUseCase: FetchAnnouncementsUseCase(announcementRepositoryImpl)),
           ),
           BlocProvider(
-            create: (_) => ResourceBloc(fetchResourcesUseCase: FetchResourcesUseCase(resourceRepositoryImpl)),
+            create: (_) => ResourceBloc(
+                fetchResourcesUseCase: FetchResourcesUseCase(resourceRepositoryImpl),
+                createResourceUseCase: CreateResourceUseCase(repository: resourceRepositoryImpl),
+            ),
           )
         ],
         child: MaterialApp(
