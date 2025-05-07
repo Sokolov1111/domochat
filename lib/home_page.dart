@@ -8,6 +8,7 @@ import 'package:domochat/features/community/data/models/community_model.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
+import 'package:domochat/features/resource/presentation/pages/resources_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -40,11 +41,17 @@ class _HomePageState extends State<HomePage> {
           icon: const Icon(Icons.menu),
           onPressed: () => _globalKey.currentState?.openDrawer(),
         ),
-        title: Text("Welcome"),
+        title: Text(
+            "Добро пожаловать в Domochat",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600
+            ),
+        ),
         actions: [
           IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.notifications_none),
+              icon: const Icon(Icons.notifications_active_outlined),
           ),
         ],
       ),
@@ -90,97 +97,103 @@ class _HomePageState extends State<HomePage> {
   }
   
   Widget _buildDrawer() {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is AuthFailure) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("error")),
-                );
-              }
-              if (state is AuthLoading) {
-                return Center(child: CircularProgressIndicator(),);
-              }
-              if (state is AuthSuccess) {
-                return UserAccountsDrawerHeader(
-                  accountName: Text(state.user.username),
-                  accountEmail: Text(state.user.email),
-                  currentAccountPicture: const CircleAvatar(
-                      backgroundImage: AssetImage("images/icon_logo_1.png")
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade800,
-                  ),
-                );
-              }
-              return Center(child: Text('Ошибка загрузки'),);
-            }
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Profile'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              );
-            },
-          ),
-          const Divider(),
-          const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'My community',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-          ),
-          BlocBuilder<CommunityListBloc, CommunityListState>(
-            builder: (context, state) {
-              if (state is CommunityListLoading) {
-                return Center(child: CircularProgressIndicator());
-              } else if (state is CommunityListLoaded) {
-                if (state.communityList.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text("Нет созданных сообществ"),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ProfilePage()),
+        );
+      },
+      child: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, state) {
+                if (state is AuthFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("error")),
                   );
                 }
-                return Column(
-                    children: state.communityList.map((community) =>
-                        ExpansionTile(
-                          leading: const Icon(Icons.apartment),
-                          title: Text("${community.adressStreet}, ${community.adressHouse}"),
-                          children: [
-                            _buildCommunityItem(
-                                'Общий чат',
-                                Icons.chat,
-                                () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                    ChatPage(community: community as CommunityModel, conversationId: community.conversationsId[0])
-                                  ));
-                                },
-                            ),
-                            _buildCommunityItem('Важное', Icons.announcement, (){}),
-                            _buildCommunityItem('Доска объявлений', Icons.list_alt, (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                  AnnouncementsListPage(communityId: community.id,)
-                              ));
-                            }),
-                            _buildCommunityItem('Совместные поездки', Icons.directions_car, (){}),
-                          ],
-                        )
-                    ).toList(),
-                );
-              } else if (state is CommunityListError) {
-                return Text(state.message);
+                if (state is AuthLoading) {
+                  return Center(child: CircularProgressIndicator(),);
+                }
+                if (state is AuthSuccess) {
+                  return UserAccountsDrawerHeader(
+                    accountName: Text(state.user.username),
+                    accountEmail: Text(state.user.email),
+                    currentAccountPicture: const CircleAvatar(
+                        backgroundImage: AssetImage("images/icon_logo_1.png")
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade800,
+                    ),
+                  );
+                }
+                return Center(child: Text('Ошибка загрузки'),);
               }
-              return const SizedBox.shrink();
-            }
-          )
-        ],
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Profile'),
+            ),
+            const Divider(),
+            const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'My community',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+            ),
+            BlocBuilder<CommunityListBloc, CommunityListState>(
+              builder: (context, state) {
+                if (state is CommunityListLoading) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (state is CommunityListLoaded) {
+                  if (state.communityList.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text("Нет созданных сообществ"),
+                    );
+                  }
+                  return Column(
+                      children: state.communityList.map((community) =>
+                          ExpansionTile(
+                            leading: const Icon(Icons.apartment),
+                            title: Text("${community.adressStreet}, ${community.adressHouse}"),
+                            children: [
+                              _buildCommunityItem(
+                                  'Общий чат',
+                                  Icons.chat,
+                                  () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                      ChatPage(community: community as CommunityModel, conversationId: community.conversationsId[0])
+                                    ));
+                                  },
+                              ),
+                              _buildCommunityItem('Важное', Icons.announcement, () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                    ResourcesPage(communityId: community.id)
+                                ));
+                              }),
+                              _buildCommunityItem('Доска объявлений', Icons.list_alt, (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                    AnnouncementsListPage(communityId: community.id,)
+                                ));
+                              }),
+                              _buildCommunityItem('Совместные поездки', Icons.directions_car, (){}),
+                            ],
+                          )
+                      ).toList(),
+                  );
+                } else if (state is CommunityListError) {
+                  return Text(state.message);
+                }
+                return const SizedBox.shrink();
+              }
+            )
+          ],
+        ),
       ),
     );
   }

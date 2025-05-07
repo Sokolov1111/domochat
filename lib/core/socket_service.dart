@@ -1,9 +1,11 @@
+import 'package:domochat/core/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
   static final SocketService _instance = SocketService._internal();
   factory SocketService() => _instance;
+  final String baseUrl = ConstantsLinks.baseUrl;
 
   late IO.Socket socket;
   final _storage = FlutterSecureStorage();
@@ -16,7 +18,7 @@ class SocketService {
 
     final token = await _storage.read(key: 'token') ?? '';
     socket = IO.io(
-      'http://10.0.2.2:6102',
+      baseUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setExtraHeaders({'Authorization': 'Bearer $token'})

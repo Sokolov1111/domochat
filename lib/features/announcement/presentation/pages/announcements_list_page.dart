@@ -45,7 +45,7 @@ class _AnnouncementsListPageState extends State<AnnouncementsListPage> {
             if (state.announcements.isEmpty) {
               return Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Нет активных объявлений'),
+                child: Center(child: Text('Нет активных объявлений')),
               );
             }
             return _buildAnnouncementsGrid(
