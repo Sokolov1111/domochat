@@ -21,7 +21,9 @@ import 'package:domochat/features/community/data/datasources/community_remote_da
 import 'package:domochat/features/community/data/repositories/community_repository_impl.dart';
 import 'package:domochat/features/community/domain/usecases/create_community_use_case.dart';
 import 'package:domochat/features/community/domain/usecases/fetch_communities_use_case.dart';
+import 'package:domochat/features/community/domain/usecases/fetch_community_members_use_case.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_members_list/members_list_bloc.dart';
 import 'package:domochat/features/community/presentation/bloc/community_bloc.dart';
 import 'package:domochat/features/community/presentation/pages/create_community_page.dart';
 import 'package:domochat/features/resource/data/datasources/resource_remote_data_source.dart';
@@ -85,6 +87,11 @@ class MyApp extends StatelessWidget {
             create: (_) => CommunityListBloc(
                 fetchCommunitiesUseCase: FetchCommunitiesUseCase(communityRepositoryImpl)
           ),),
+          BlocProvider(
+              create: (_) => MembersListBloc(
+                  fetchCommunityMembersUseCase: FetchCommunityMembersUseCase(communityRepositoryImpl)
+              )
+          ),
           BlocProvider(
               create: (_) => ChatBloc(fetchMessagesUseCase: FetchMessagesUseCase(messageRepository: messageRepositoryImpl))
           ),

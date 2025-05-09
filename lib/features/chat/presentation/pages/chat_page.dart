@@ -2,6 +2,7 @@ import 'package:domochat/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:domochat/features/chat/presentation/bloc/chat_event.dart';
 import 'package:domochat/features/chat/presentation/bloc/chat_state.dart';
 import 'package:domochat/features/community/data/models/community_model.dart';
+import 'package:domochat/features/community/presentation/pages/community_members_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -76,19 +77,26 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text(widget.community.adressStreet, style: Theme.of(context).textTheme.titleMedium,),
-            SizedBox(width: 10,),
-            Text(
-              "Чат",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
+        title: Text(
+          '${widget.community.adressStreet}, ${widget.community.adressHouse} (Общий чат)',
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CommunityMembersPage(communityId: widget.community.id),
+                  ),
+                );
+              },
+              icon: Icon(Icons.people_alt_outlined),
+          ),
+
+        ],
       ),
       body: Column(
         children: [
