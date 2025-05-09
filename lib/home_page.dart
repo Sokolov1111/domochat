@@ -9,6 +9,7 @@ import 'package:domochat/features/community/presentation/bloc/bloc_load_list/com
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
 import 'package:domochat/features/resource/presentation/pages/resources_page.dart';
+import 'package:domochat/features/trip/presentation/pages/trip_requests_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -181,7 +182,11 @@ class _HomePageState extends State<HomePage> {
                                     AnnouncementsListPage(communityId: community.id,)
                                 ));
                               }),
-                              _buildCommunityItem('Совместные поездки', Icons.directions_car, (){}),
+                              _buildCommunityItem('Совместные поездки', Icons.directions_car, (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                    TripRequestsPage()
+                                ));
+                              }),
                             ],
                           )
                       ).toList(),
@@ -258,8 +263,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  void _createCommunity() {}
 
   void _joinCommunity() {}
 }
