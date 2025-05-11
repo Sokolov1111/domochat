@@ -2,19 +2,28 @@ import 'package:domochat/features/chat/presentation/bloc/chat_bloc.dart';
 import 'package:domochat/features/chat/presentation/bloc/chat_event.dart';
 import 'package:domochat/features/chat/presentation/bloc/chat_state.dart';
 import 'package:domochat/features/community/data/models/community_model.dart';
+import 'package:domochat/features/community/domain/entities/member_entity.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_members_list/members_list_bloc.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_members_list/members_list_event.dart';
+import 'package:domochat/features/community/presentation/bloc/bloc_load_members_list/members_list_state.dart';
 import 'package:domochat/features/community/presentation/pages/community_members_page.dart';
+import 'package:domochat/utils/date_time_converter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ChatPage extends StatefulWidget {
-  final CommunityModel community;
   final String conversationId;
+  final bool isPrivateChat;
+  final CommunityModel? communityModel;
+  final String? recipientName;
 
   const ChatPage({
     super.key,
-    required this.community,
     required this.conversationId,
+    required this.isPrivateChat,
+    this.communityModel,
+    this.recipientName,
   });
 
   @override
@@ -31,6 +40,9 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     BlocProvider.of<ChatBloc>(context).add(LoadMessageEvent(widget.conversationId));
+    if (widget.communityModel != null) {
+      BlocProvider.of<MembersListBloc>(context).add(FetchMembers(communityId: widget.communityModel!.id));
+    }
     fetchUserId();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
@@ -73,30 +85,44 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  String findSender(List<MemberEntity> membersList, String senderId) {
+    for(int i = 0; i < membersList.length; i++) {
+      if (membersList[i].userId == senderId) {
+        return membersList[i].fullName;
+      }
+    }
+    return 'Unknown';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${widget.community.adressStreet}, ${widget.community.adressHouse} (Общий чат)',
+          widget.isPrivateChat
+            ? widget.recipientName ?? 'Личный чат'
+            : widget.communityModel?.adressHouse ?? 'Общий чат',
           style: Theme.of(context).textTheme.titleMedium,
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        CommunityMembersPage(communityId: widget.community.id),
-                  ),
-                );
-              },
-              icon: Icon(Icons.people_alt_outlined),
-          ),
+        actions:
+            widget.isPrivateChat
+                ? null
+                : [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CommunityMembersPage(communityId: widget.communityModel!.id),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.people_alt_outlined),
+              ),
 
-        ],
+            ],
       ),
       body: Column(
         children: [
@@ -115,9 +141,40 @@ class _ChatPageState extends State<ChatPage> {
                             final message = state.messages[index];
                             final isSentMessage = message.senderId == userId;
                             if (isSentMessage) {
-                              return _buildSentMessage(context, message.content, message.createdAt);
+                              return _buildSentMessage(context, message.content, DateTimeConverter.formatTimeHHmm(message.createdAt));
                             } else {
-                              return _buildReceivedMessage(context, message.content, message.createdAt);
+                              if (widget.isPrivateChat == false) {
+                                return BlocBuilder<MembersListBloc, MembersListState>(
+                                  builder: (context, state) {
+                                    if (state is MembersListLoading) {
+                                      return Center(child: CircularProgressIndicator(),);
+                                    } else if (state is MembersListLoaded) {
+                                      if (state.membersList.isEmpty) {
+                                        return Center(child: Text('Нет участников'),);
+                                      }
+                                      return _buildReceivedMessage(
+                                          context,
+                                          message.content,
+                                          DateTimeConverter.formatTimeHHmm(message.createdAt),
+                                          findSender(state.membersList, message.senderId)
+                                      );
+                                    } else if (state is MembersListError) {
+                                      return Center(
+                                        child: Text('Ошибка загрузки ${state.message}'),
+                                      );
+                                    }
+                                    return SizedBox.shrink();
+                                  },
+                                );
+                              } else {
+                                return _buildReceivedMessage(
+                                    context,
+                                    message.content,
+                                    DateTimeConverter.formatTimeHHmm(message.createdAt),
+                                    widget.recipientName!
+                                );
+                              }
+
                             }
                           }
                         );
@@ -140,9 +197,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildReceivedMessage(BuildContext context, String message, String createdAt) {
-   // DateTime dateTime = DateTime.parse(createdAt.replaceAll('', 'T'));
-   // String time = "${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}";
+  Widget _buildReceivedMessage(BuildContext context, String message, String createdAt, String senderName) {
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
@@ -172,15 +227,24 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
               const SizedBox(height: 4,),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Text(
-                  createdAt,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    senderName,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600
+                    ),
                   ),
-                ),
+                  Text(
+                    createdAt,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600
+                    ),
+                  ),
+                ],
               )
             ],
           ),

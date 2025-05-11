@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:domochat/core/constants.dart';
 import 'package:domochat/features/announcement/presentation/pages/announcements_list_page.dart';
+import 'package:domochat/features/announcement/presentation/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -102,7 +103,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
                 SizedBox(height: 24,),
                 _buildImageUploadSection(),
                 SizedBox(height: 32,),
-                _buildSubmitButton(),
+                //_buildSubmitButton(),
+                SubmitButton(
+                    text: 'Опубликовать',
+                    onPressed: _submitForm
+                )
               ],
             ),
           ),
@@ -258,20 +263,4 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     );
   }
 
-  Widget _buildSubmitButton() {
-    return ElevatedButton(
-      onPressed: _submitForm,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue[800],
-        padding: EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10)),
-      ),
-      child: Text('Опубликовать',
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.white)),
-    );
-  }
 }

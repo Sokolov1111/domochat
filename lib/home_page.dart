@@ -185,7 +185,8 @@ class _HomePageState extends State<HomePage> {
                                   Icons.chat,
                                   () {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                      ChatPage(community: community as CommunityModel, conversationId: community.conversationsId[0])
+                                      //ChatPage(community: community as CommunityModel, conversationId: community.conversationsId[0])
+                                      ChatPage(conversationId: community.conversationsId[0], isPrivateChat: false, communityModel: community as CommunityModel,)
                                     ));
                                   },
                               ),
