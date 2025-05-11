@@ -1,4 +1,5 @@
 import 'package:domochat/features/announcement/data/models/announcement_model.dart';
+import 'package:domochat/features/announcement/presentation/widgets/submit_button.dart';
 import 'package:flutter/material.dart';
 
 class AnnouncementDetailPage extends StatefulWidget {
@@ -63,6 +64,13 @@ class _AnnouncementDetailPageState extends State<AnnouncementDetailPage> {
                   SizedBox(height: 30),
                   _buildInfoSection('Дата публикации',
                       widget.announcement.date),
+                  SizedBox(height: 30,),
+                  Center(
+                    child: SubmitButton(
+                        text: "Написать ${widget.announcement.author}",
+                        onPressed: () {}
+                    ),
+                  ),
                 ],
               ),
             ),
