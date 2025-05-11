@@ -8,6 +8,9 @@ import 'package:domochat/features/community/data/models/community_model.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_bloc.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_event.dart';
 import 'package:domochat/features/community/presentation/bloc/bloc_load_list/community_list_state.dart';
+import 'package:domochat/features/community/presentation/pages/community_management_page.dart';
+import 'package:domochat/features/community/presentation/pages/generate_invite_code_page.dart';
+import 'package:domochat/features/community/presentation/pages/join_community_page.dart';
 import 'package:domochat/features/resource/presentation/pages/resources_page.dart';
 import 'package:domochat/features/trip/presentation/pages/trip_requests_page.dart';
 import 'package:flutter/material.dart';
@@ -25,12 +28,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final String _selectedCommunity = "My house";
+  String userId = '';
   final _storage = FlutterSecureStorage();
 
   @override
   void initState() {
    super.initState();
+   fetchUserId();
    BlocProvider.of<CommunityListBloc>(context).add(FetchCommunities());
+  }
+
+  fetchUserId() async {
+    userId = await _storage.read(key: 'userId') ?? '';
+    setState(() {
+      userId = userId;
+    });
   }
 
   @override
@@ -75,7 +87,12 @@ class _HomePageState extends State<HomePage> {
               icon: Icons.login,
               title: 'Присоединиться к сообществу',
               color: Colors.blue,
-              onTap: () => _joinCommunity(),
+              onTap: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => JoinCommunityPage()),
+                )
+              },
             ),
             const SizedBox(height: 24,),
             const Text(
@@ -184,9 +201,20 @@ class _HomePageState extends State<HomePage> {
                               }),
                               _buildCommunityItem('Совместные поездки', Icons.directions_car, (){
                                 Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                    TripRequestsPage()
+                                    GenerateInviteCodePage(communityId: community.id)
                                 ));
                               }),
+                              if (userId == community.creatorId)
+                                _buildCommunityItem(
+                                    'Управление',
+                                    Icons.settings_outlined,
+                                    (){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                          CommunityManagementPage(communityId: community.id)
+                                      ));
+                                    },
+                                  isAdmin: true,
+                                ),
                             ],
                           )
                       ).toList(),
@@ -203,11 +231,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCommunityItem(String title, IconData icon, void Function()? _onTap) {
+  Widget _buildCommunityItem(String title, IconData icon, void Function()? _onTap, {bool isAdmin = false}) {
     return ListTile(
       dense: true,
-      leading: Icon(icon, size: 20,),
-      title: Text(title),
+      leading: Icon(icon, size: 20, color: isAdmin ? Colors.blue : null),
+      title: Text(
+          title,
+          style: TextStyle(
+            color: isAdmin ? Colors.blue : null,
+            fontWeight: isAdmin ? FontWeight.bold : null,
+          ),
+      ),
       onTap: _onTap,
     );
   }
