@@ -31,6 +31,11 @@ import 'package:domochat/features/resource/data/repositories/resource_repository
 import 'package:domochat/features/resource/domain/usecases/create_resource_use_case.dart';
 import 'package:domochat/features/resource/domain/usecases/fetch_resources_use_case.dart';
 import 'package:domochat/features/resource/presentation/bloc/resource_bloc.dart';
+import 'package:domochat/features/ride/data/datasources/ride_remote_data_source.dart';
+import 'package:domochat/features/ride/data/repositories/ride_repository_impl.dart';
+import 'package:domochat/features/ride/domain/usecases/create_ride_use_case.dart';
+import 'package:domochat/features/ride/domain/usecases/fetch_ride_use_case.dart';
+import 'package:domochat/features/ride/presentation/bloc/ride_bloc.dart';
 import 'package:domochat/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,6 +46,7 @@ void main() {
   final messageRepository = MessageRepositoryImpl(remoteDataSource: MessageRemoteDataSource());
   final announcementRepository = AnnouncementRepositoryImpl(announcementRemoteDataSource: AnnouncementRemoteDatasource());
   final resourceRepository = ResourceRepositoryImpl(resourceRemoteDataSource: ResourceRemoteDataSource());
+  final rideRepository = RideRepositoryImpl(rideRemoteDataSource: RideRemoteDataSource());
 
   runApp(MyApp(
     authRepositoryImpl: authRepository,
@@ -48,6 +54,7 @@ void main() {
     messageRepositoryImpl: messageRepository,
     announcementRepositoryImpl: announcementRepository,
     resourceRepositoryImpl: resourceRepository,
+    rideRepositoryImpl: rideRepository,
   ));
 }
 
@@ -57,6 +64,7 @@ class MyApp extends StatelessWidget {
   final MessageRepositoryImpl messageRepositoryImpl;
   final AnnouncementRepositoryImpl announcementRepositoryImpl;
   final ResourceRepositoryImpl resourceRepositoryImpl;
+  final RideRepositoryImpl rideRepositoryImpl;
 
   const MyApp({
     super.key,
@@ -65,6 +73,7 @@ class MyApp extends StatelessWidget {
     required this.messageRepositoryImpl,
     required this.announcementRepositoryImpl,
     required this.resourceRepositoryImpl,
+    required this.rideRepositoryImpl,
   });
 
   @override
@@ -103,7 +112,13 @@ class MyApp extends StatelessWidget {
                 fetchResourcesUseCase: FetchResourcesUseCase(resourceRepositoryImpl),
                 createResourceUseCase: CreateResourceUseCase(repository: resourceRepositoryImpl),
             ),
-          )
+          ),
+          BlocProvider(
+              create: (_) => RideBloc(
+                  fetchRideUseCase: FetchRideUseCase(rideRepositoryImpl),
+                  createRideUseCase: CreateRideUseCase(repository: rideRepositoryImpl),
+              ),
+          ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

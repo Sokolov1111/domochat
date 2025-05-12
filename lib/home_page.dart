@@ -12,7 +12,7 @@ import 'package:domochat/features/community/presentation/pages/community_managem
 import 'package:domochat/features/community/presentation/pages/generate_invite_code_page.dart';
 import 'package:domochat/features/community/presentation/pages/join_community_page.dart';
 import 'package:domochat/features/resource/presentation/pages/resources_page.dart';
-import 'package:domochat/features/trip/presentation/pages/trip_requests_page.dart';
+import 'package:domochat/features/ride/presentation/pages/shared_rides_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                               }),
                               _buildCommunityItem('Совместные поездки', Icons.directions_car, (){
                                 Navigator.push(context, MaterialPageRoute(builder: (context) =>
-                                    GenerateInviteCodePage(communityId: community.id)
+                                    SharedRidesPages(communityId: community.id)
                                 ));
                               }),
                               if (userId == community.creatorId)
