@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:domochat/core/constants.dart';
 import 'package:domochat/features/resource/data/models/resource_model.dart';
