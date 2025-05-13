@@ -2,6 +2,7 @@ import 'package:domochat/features/ride/data/models/ride_model.dart';
 import 'package:domochat/features/ride/presentation/bloc/ride_bloc.dart';
 import 'package:domochat/features/ride/presentation/bloc/ride_event.dart';
 import 'package:domochat/features/ride/presentation/bloc/ride_state.dart';
+import 'package:domochat/features/ride/presentation/pages/shared_ride_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,7 +57,14 @@ class _SharedRidesPagesState extends State<SharedRidesPages> {
         padding: const EdgeInsets.all(16),
         itemCount: rides.length,
         itemBuilder: (context, index) => InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SharedRideDetailPage(ride: rides[index]),
+              ),
+            );
+          },
           child: _SharedRideCard(ride: rides[index]),
         )
     );
